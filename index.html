@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FormaCI — Vos formations, livrées comme un colis</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FormaCI">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ff6600">
+<style>
+  :root{
+    --orange:#ff6600;
+    --orange-dark:#e05a00;
+    --green:#128a3e;
+    --bg:#f4f5f7;
+    --card:#ffffff;
+    --text:#1c1c1c;
+    --text-muted:#6b7280;
+    --border:#e5e7eb;
+    --header-bg:#ffffff;
+    --badge-bg:#fff1e6;
+    --wave-blue:#1dc0f2;
+    --om-orange:#ff7900;
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --bg:#14161a; --card:#1e2126; --text:#f2f2f2; --text-muted:#9aa0aa;
+      --border:#2b2f36; --header-bg:#1a1d22; --badge-bg:#3a2415;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161a; --card:#1e2126; --text:#f2f2f2; --text-muted:#9aa0aa;
+    --border:#2b2f36; --header-bg:#1a1d22; --badge-bg:#3a2415;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+
+  header{background:var(--header-bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+  .topbar{background:var(--orange);color:#fff;font-size:12px;text-align:center;padding:5px 8px;}
+  .nav{display:flex;align-items:center;gap:10px;padding:10px 14px;max-width:1100px;margin:0 auto;flex-wrap:wrap;}
+  .logo{font-weight:800;font-size:20px;color:var(--orange);white-space:nowrap;display:flex;align-items:center;gap:4px;}
+  .logo span{color:var(--green);}
+  .search-box{flex:1;min-width:140px;display:flex;border:2px solid var(--orange);border-radius:6px;overflow:hidden;}
+  .search-box input{flex:1;border:none;padding:9px 10px;font-size:14px;outline:none;background:var(--card);color:var(--text);}
+  .search-box button{background:var(--orange);color:#fff;border:none;padding:0 14px;cursor:pointer;font-size:15px;}
+  .nav-actions{display:flex;align-items:center;gap:12px;}
+  .icon-btn{position:relative;background:none;border:none;cursor:pointer;color:var(--text);font-size:20px;display:flex;flex-direction:column;align-items:center;font-family:inherit;}
+  .icon-btn small{font-size:10px;color:var(--text-muted);}
+  .cart-count{position:absolute;top:-4px;right:-8px;background:var(--green);color:#fff;font-size:10px;font-weight:700;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;}
+
+  .cat-bar{display:flex;gap:8px;padding:10px 14px;overflow-x:auto;max-width:1100px;margin:0 auto;scrollbar-width:none;}
+  .cat-bar::-webkit-scrollbar{display:none;}
+  .cat-chip{flex-shrink:0;padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;cursor:pointer;white-space:nowrap;}
+  .cat-chip.active{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:600;}
+
+  .hero{max-width:1100px;margin:14px auto;padding:0 14px;}
+  .hero-banner{background:linear-gradient(120deg,var(--orange),#ff9248);border-radius:14px;padding:26px 22px;color:#fff;}
+  .hero-banner h1{margin:0 0 6px;font-size:22px;line-height:1.3;}
+  .hero-banner p{margin:0;font-size:14px;opacity:.95;}
+
+  main{max-width:1100px;margin:0 auto;padding:6px 14px 60px;}
+  .section-title{font-size:17px;font-weight:700;margin:22px 0 12px;display:flex;align-items:center;justify-content:space-between;}
+  .section-title span.tag{font-size:12px;font-weight:500;color:var(--text-muted);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+  .course-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:box-shadow .15s;}
+  .course-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);}
+  .thumb{height:100px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff;}
+  .card-body{padding:10px;display:flex;flex-direction:column;gap:4px;flex:1;}
+  .badge{align-self:flex-start;background:var(--badge-bg);color:var(--orange);font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;}
+  .course-title{font-size:13px;font-weight:600;line-height:1.3;min-height:34px;}
+  .course-instructor{font-size:11px;color:var(--text-muted);}
+  .stars{font-size:11px;color:#f5a623;}
+  .price-row{display:flex;align-items:baseline;gap:6px;margin-top:2px;}
+  .price{font-weight:800;color:var(--green);font-size:15px;}
+  .old-price{font-size:11px;color:var(--text-muted);text-decoration:line-through;}
+  .add-btn{margin-top:6px;background:var(--orange);color:#fff;border:none;border-radius:6px;padding:7px;font-size:12px;font-weight:700;cursor:pointer;}
+  .add-btn:active{background:var(--orange-dark);}
+  .add-btn.added{background:var(--green);}
+
+  .seller-panel{background:var(--card);border:1px dashed var(--orange);border-radius:12px;padding:16px;margin-top:26px;}
+  .seller-panel h3{margin:0 0 4px;font-size:15px;}
+  .seller-panel p{margin:0 0 12px;font-size:12.5px;color:var(--text-muted);}
+  .seller-form{display:grid;gap:8px;grid-template-columns:1fr 1fr;}
+  .seller-form input,.seller-form select,.seller-form textarea{padding:9px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);grid-column:span 1;font-family:inherit;}
+  .seller-form input[name="titre"],.seller-form textarea{grid-column:span 2;}
+  .seller-form button{grid-column:span 2;background:var(--green);color:#fff;border:none;padding:10px;border-radius:6px;font-weight:700;cursor:pointer;font-size:13px;}
+
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60;}
+  .overlay.open{opacity:1;pointer-events:auto;}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(340px,88vw);background:var(--card);transform:translateX(100%);transition:transform .25s;z-index:70;display:flex;flex-direction:column;}
+  .drawer.open{transform:translateX(0);}
+  .drawer-header{padding:14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .drawer-header h3{margin:0;font-size:16px;}
+  .drawer-header button{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text);}
+  .drawer-body{flex:1;overflow-y:auto;padding:10px 14px;}
+  .cart-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;}
+  .cart-item .mini-thumb{width:44px;height:44px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;}
+  .cart-item-info{flex:1;}
+  .cart-item-info .t{font-size:12.5px;font-weight:600;}
+  .cart-item-info .p{font-size:12px;color:var(--green);font-weight:700;}
+  .remove-x{background:none;border:none;color:#c0392b;cursor:pointer;font-size:16px;}
+  .drawer-footer{padding:14px;border-top:1px solid var(--border);}
+  .total-row{display:flex;justify-content:space-between;font-weight:700;margin-bottom:10px;font-size:15px;}
+  .checkout-btn{width:100%;background:var(--green);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;}
+  .empty-cart{color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0;}
+
+  /* Modals (settings / course detail / checkout) */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:90;}
+  .modal-overlay.open{display:flex;}
+  @media (min-width:640px){.modal-overlay{align-items:center;}}
+  .modal{background:var(--card);width:100%;max-width:480px;max-height:88vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:18px;}
+  @media (min-width:640px){.modal{border-radius:14px;}}
+  .modal h2{margin:0 0 4px;font-size:17px;}
+  .modal .close-x{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text);}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-muted);}
+  .field input{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text);}
+  .field small{display:block;margin-top:3px;color:var(--text-muted);font-size:11px;}
+  .save-btn{width:100%;background:var(--orange);color:#fff;border:none;padding:11px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;margin-top:4px;}
+
+  .pay-option{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;}
+  .pay-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0;}
+  .pay-icon.wave{background:var(--wave-blue);}
+  .pay-icon.om{background:var(--om-orange);}
+  .pay-details .name{font-size:13px;font-weight:700;}
+  .pay-details .num{font-size:15px;font-weight:800;letter-spacing:.3px;}
+  .pay-details .hint{font-size:11px;color:var(--text-muted);}
+  .checkout-total{background:var(--badge-bg);border-radius:10px;padding:10px 14px;text-align:center;font-weight:800;color:var(--orange);font-size:16px;margin-bottom:14px;}
+  .whatsapp-btn{width:100%;background:#25D366;color:#fff;border:none;padding:13px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .config-warning{background:var(--badge-bg);border:1px dashed var(--orange);border-radius:8px;padding:10px;font-size:12px;color:var(--orange);margin-bottom:12px;}
+
+  .detail-header{height:140px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:46px;color:#fff;margin-bottom:12px;}
+  .detail-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);margin-bottom:10px;}
+  .detail-desc{font-size:13.5px;line-height:1.5;margin-bottom:14px;}
+  .modules{list-style:none;padding:0;margin:0 0 16px;}
+  .modules li{padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;gap:8px;}
+  .modules li::before{content:"✓";color:var(--green);font-weight:800;}
+
+  .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(20px);background:#1c1c1c;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;opacity:0;transition:all .25s;z-index:100;pointer-events:none;max-width:88vw;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  footer{text-align:center;padding:20px;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border);}
+  footer button{background:none;border:none;color:var(--orange);text-decoration:underline;cursor:pointer;font-size:12px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">🎓 Paiement via Wave / Orange Money · Accès envoyé sur WhatsApp après validation</div>
+  <div class="nav">
+    <div class="logo">Forma<span>CI</span></div>
+    <div class="search-box">
+      <input id="searchInput" type="text" placeholder="Rechercher une formation...">
+      <button onclick="applyFilters()">🔍</button>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" onclick="openSettings()">⚙️<small>Réglages</small></button>
+      <button class="icon-btn" onclick="toggleSellerPanel()">➕<small>Vendre</small></button>
+      <button class="icon-btn" onclick="openCart()">🛒<span class="cart-count" id="cartCount">0</span><small>Panier</small></button>
+    </div>
+  </div>
+  <div class="cat-bar" id="catBar"></div>
+</header>
+
+<div class="hero">
+  <div class="hero-banner">
+    <h1>Forme les futurs soignants de Côte d'Ivoire.</h1>
+    <p>Achetez une formation, payez par Wave ou Orange Money, recevez l'accès directement sur WhatsApp.</p>
+  </div>
+</div>
+
+<main>
+  <div class="section-title">Toutes les formations <span class="tag" id="resultCount"></span></div>
+  <div class="grid" id="courseGrid"></div>
+
+  <div class="seller-panel" id="sellerPanel" style="display:none;">
+    <h3>📤 Mettre une formation en vente</h3>
+    <p>Remplis les infos ci-dessous, elle apparaîtra directement dans la boutique.</p>
+    <div class="seller-form">
+      <input name="titre" id="f_titre" placeholder="Titre de la formation">
+      <textarea id="f_desc" rows="2" placeholder="Description courte"></textarea>
+      <select id="f_cat">
+        <option>Médecine & Santé</option>
+        <option>Méthodologie & Réussite</option>
+        <option>Langues</option>
+        <option>Compétences pratiques</option>
+      </select>
+      <input id="f_prix" type="number" placeholder="Prix (FCFA)">
+      <input id="f_emoji" placeholder="Emoji (ex: 🩺, 💻...)">
+      <input id="f_niveau" placeholder="Niveau (ex: Débutant)">
+      <button onclick="addCourse()">Publier la formation</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Boutique FormaCI — les paiements sont réceptionnés manuellement via Wave / Orange Money, l'accès est ensuite envoyé par le vendeur sur WhatsApp.<br>
+  <button onclick="openSettings()">Configurer mes numéros de réception</button>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h3>Mon panier</h3>
+    <button onclick="closeCart()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-footer">
+    <div class="total-row"><span>Total</span><span id="totalPrice">0 FCFA</span></div>
+    <button class="checkout-btn" onclick="openCheckout()">Passer la commande</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('settingsModal')">✕</button>
+    <h2>⚙️ Mes coordonnées de réception</h2>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:0;">Ces informations restent uniquement sur cet appareil (navigateur). Elles servent à afficher vos numéros aux acheteurs pour le paiement.</p>
+    <div class="field">
+      <label>Numéro Wave</label>
+      <input id="s_wave" placeholder="Ex: 07 00 00 00 00">
+    </div>
+    <div class="field">
+      <label>Numéro Orange Money</label>
+      <input id="s_om" placeholder="Ex: 07 00 00 00 00">
+    </div>
+    <div class="field">
+      <label>Numéro WhatsApp (avec indicatif)</label>
+      <input id="s_wa" placeholder="Ex: 225070000000">
+      <small>Format international sans le "+" ni espace, ex: 2250700000000</small>
+    </div>
+    <div class="field">
+      <label>Nom à afficher (Wave / OM)</label>
+      <input id="s_name" placeholder="Ex: Bamba T.">
+    </div>
+    <button class="save-btn" onclick="saveSettings()">Enregistrer</button>
+  </div>
+</div>
+
+<!-- COURSE DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal" id="detailContent"></div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('checkoutModal')">✕</button>
+    <h2>💳 Paiement</h2>
+    <div id="checkoutBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let courses = [
+  {id:1,title:"Réussir son concours d'internat en médecine",cat:"Médecine & Santé",price:25000,old:35000,instructor:"Bamba T. — étudiant 6e année",rating:4.9,emoji:"🩺",color:"#128a3e",level:"Intermédiaire",duration:"6h de cours + fiches",
+    desc:"Une préparation ciblée pour aborder sereinement le concours d'internat : méthode de révision, pièges classiques et annales corrigées.",
+    modules:["Comprendre le format et les attendus du concours","Méthode de révision rapide par grands systèmes","Annales commentées et corrigées","Fiches de synthèse à imprimer","Simulateur de QCM chronométré"]},
+  {id:2,title:"Sémiologie médicale démystifiée",cat:"Médecine & Santé",price:18000,instructor:"Bamba T. — étudiant 6e année",rating:4.7,emoji:"🩻",color:"#0f766e",level:"Débutant",duration:"5h de cours",
+    desc:"Apprendre à interroger et examiner un patient avec méthode, pour ne plus rien oublier lors des stages ou des examens cliniques.",
+    modules:["L'interrogatoire structuré","L'examen cardiovasculaire pas à pas","L'examen pulmonaire pas à pas","L'examen abdominal pas à pas","Rédiger une observation clinique claire"]},
+  {id:3,title:"Pharmacologie : les bases sans se noyer",cat:"Médecine & Santé",price:20000,instructor:"Bamba T. — étudiant 6e année",rating:4.8,emoji:"💊",color:"#dc2626",level:"Intermédiaire",duration:"7h de cours",
+    desc:"Une manière simple de retenir les grandes classes médicamenteuses, leurs mécanismes et leurs pièges classiques aux examens.",
+    modules:["Pharmacocinétique en 20 minutes","Les grandes classes d'antibiotiques","Antalgiques et anti-inflammatoires","Interactions médicamenteuses fréquentes","Moyens mnémotechniques efficaces"]},
+  {id:4,title:"Urgences & premiers secours pour étudiants en santé",cat:"Médecine & Santé",price:16000,instructor:"Bamba T. — étudiant 6e année",rating:4.9,emoji:"🚑",color:"#b91c1c",level:"Débutant",duration:"4h de cours",
+    desc:"Les réflexes essentiels face à un arrêt cardiaque, une hémorragie ou un étouffement, à connaître avant tout stage hospitalier.",
+    modules:["Bilan initial et alerte des secours","Réanimation cardio-pulmonaire (RCP)","Gestion d'une hémorragie externe","Position latérale de sécurité","Cas pratiques filmés"]},
+  {id:5,title:"Réussir ses stages hospitaliers",cat:"Méthodologie & Réussite",price:12000,instructor:"Bamba T. — étudiant 6e année",rating:4.6,emoji:"🏥",color:"#2563eb",level:"Débutant",duration:"3h de cours",
+    desc:"Comment s'intégrer rapidement dans un service, gagner la confiance de l'équipe et apprendre efficacement pendant ses stages.",
+    modules:["Les 5 premières minutes dans un nouveau service","Bien présenter un dossier patient à la visite","Poser les bonnes questions sans déranger","Gérer la fatigue et la charge de travail","Construire son carnet de bord de stage"]},
+  {id:6,title:"Méthode de révision pour la fac de médecine",cat:"Méthodologie & Réussite",price:14000,old:18000,instructor:"Bamba T. — étudiant 6e année",rating:4.7,emoji:"📚",color:"#7c3aed",level:"Débutant",duration:"4h de cours",
+    desc:"Une méthode concrète, testée sur plusieurs années d'études, pour organiser ses révisions et retenir plus avec moins de stress.",
+    modules:["Planifier son semestre en 1h","La technique de répétition espacée","Fiches actives vs relecture passive","Réviser en groupe efficacement","Gérer le stress la veille des examens"]},
+  {id:7,title:"Anglais médical pour soignants",cat:"Langues",price:14000,instructor:"Bamba T. — étudiant 6e année",rating:4.4,emoji:"🗣️",color:"#9333ea",level:"Intermédiaire",duration:"5h de cours",
+    desc:"Le vocabulaire et les expressions indispensables pour lire un article scientifique ou échanger avec un patient anglophone.",
+    modules:["Vocabulaire de l'anatomie en anglais","Décrire des symptômes en anglais","Comprendre un article scientifique","Expressions utiles en consultation","Quiz et mises en situation"]},
+  {id:8,title:"Gestion du stress et des examens",cat:"Méthodologie & Réussite",price:9000,instructor:"Bamba T. — étudiant 6e année",rating:4.6,emoji:"🧘",color:"#059669",level:"Débutant",duration:"2h30 de cours",
+    desc:"Des outils simples de respiration et d'organisation mentale pour aborder les périodes d'examen sans s'épuiser.",
+    modules:["Comprendre le mécanisme du stress","Respiration et ancrage rapide","Organiser sa dernière semaine avant l'examen","Gérer le trac le jour J","Routine de récupération après l'examen"]},
+  {id:9,title:"Préparer son mémoire de fin d'études",cat:"Méthodologie & Réussite",price:17000,instructor:"Bamba T. — étudiant 6e année",rating:4.5,emoji:"📝",color:"#1d4ed8",level:"Avancé",duration:"6h de cours",
+    desc:"De la recherche du sujet à la soutenance : une méthode claire pour avancer sans procrastiner sur son mémoire.",
+    modules:["Choisir et cadrer son sujet","Structurer son plan","Rechercher et citer ses sources","Rédiger sans procrastiner","Préparer sa soutenance orale"]},
+  {id:10,title:"Introduction aux gestes techniques de base",cat:"Compétences pratiques",price:19000,instructor:"Bamba T. — étudiant 6e année",rating:4.8,emoji:"🧵",color:"#ea580c",level:"Intermédiaire",duration:"5h de cours",
+    desc:"Les gestes techniques les plus demandés en stage : pose de voie veineuse, suture simple, prise de constantes.",
+    modules:["Matériel et asepsie de base","Pose d'une voie veineuse périphérique","Suture simple point par point","Prise et interprétation des constantes","Erreurs fréquentes à éviter"]}
+];
+
+let cart = [];
+let activeCat = "Tous";
+let nextId = 11;
+let settings = {wave:"", om:"", wa:"", name:""};
+
+const categories = ["Tous","Médecine & Santé","Méthodologie & Réussite","Langues","Compétences pratiques"];
+
+function loadSettings(){
+  try{
+    const raw = localStorage.getItem('formaci_settings');
+    if(raw) settings = JSON.parse(raw);
+  }catch(e){ /* localStorage indisponible, on garde les valeurs par défaut */ }
+}
+function persistSettings(){
+  try{ localStorage.setItem('formaci_settings', JSON.stringify(settings)); }catch(e){}
+}
+
+function renderCatBar(){
+  document.getElementById('catBar').innerHTML = categories.map(c =>
+    `<button class="cat-chip ${c===activeCat?'active':''}" onclick="setCat('${c}')">${c}</button>`
+  ).join('');
+}
+function setCat(c){ activeCat = c; renderCatBar(); applyFilters(); }
+
+function applyFilters(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let list = courses.filter(c => (activeCat==='Tous' || c.cat===activeCat) && c.title.toLowerCase().includes(q));
+  renderGrid(list);
+}
+
+function renderGrid(list){
+  const grid = document.getElementById('courseGrid');
+  document.getElementById('resultCount').textContent = list.length + ' formation(s)';
+  if(list.length===0){
+    grid.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">Aucune formation trouvée.</p>';
+    return;
+  }
+  grid.innerHTML = list.map(c => `
+    <div class="course-card" onclick="openDetail(${c.id})">
+      <div class="thumb" style="background:${c.color}">${c.emoji}</div>
+      <div class="card-body">
+        ${c.old ? '<span class="badge">PROMO</span>' : ''}
+        <div class="course-title">${c.title}</div>
+        <div class="course-instructor">${c.instructor}</div>
+        <div class="stars">${'★'.repeat(Math.round(c.rating))}${'☆'.repeat(5-Math.round(c.rating))} <span style="color:var(--text-muted)">(${c.rating})</span></div>
+        <div class="price-row">
+          <span class="price">${c.price.toLocaleString('fr-FR')} FCFA</span>
+          ${c.old ? `<span class="old-price">${c.old.toLocaleString('fr-FR')}</span>` : ''}
+        </div>
+        <button class="add-btn" id="btn-${c.id}" onclick="event.stopPropagation();addToCart(${c.id}, this)">Ajouter au panier</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openDetail(id){
+  const c = courses.find(x=>x.id===id);
+  document.getElementById('detailContent').innerHTML = `
+    <button class="close-x" onclick="closeModal('detailModal')">✕</button>
+    <div class="detail-header" style="background:${c.color}">${c.emoji}</div>
+    <h2>${c.title}</h2>
+    <div class="detail-meta">
+      <span>👤 ${c.instructor}</span>
+      <span>⏱ ${c.duration}</span>
+      <span>📶 ${c.level}</span>
+      <span>⭐ ${c.rating}</span>
+    </div>
+    <div class="detail-desc">${c.desc}</div>
+    <strong style="font-size:13px;">Ce que vous allez apprendre :</strong>
+    <ul class="modules">${c.modules.map(m=>`<li>${m}</li>`).join('')}</ul>
+    <div class="price-row" style="margin-bottom:10px;">
+      <span class="price" style="font-size:18px;">${c.price.toLocaleString('fr-FR')} FCFA</span>
+      ${c.old ? `<span class="old-price">${c.old.toLocaleString('fr-FR')}</span>` : ''}
+    </div>
+    <button class="save-btn" onclick="addToCart(${c.id});closeModal('detailModal');">Ajouter au panier</button>
+  `;
+  openModal('detailModal');
+}
+
+function addToCart(id, btn){
+  const course = courses.find(c=>c.id===id);
+  cart.push(course);
+  updateCartUI();
+  showToast(course.title + ' ajouté au panier');
+  if(btn){
+    btn.textContent = '✓ Ajouté';
+    btn.classList.add('added');
+    setTimeout(()=>{btn.textContent='Ajouter au panier';btn.classList.remove('added');},1200);
+  }
+}
+function removeFromCart(index){ cart.splice(index,1); updateCartUI(); }
+
+function updateCartUI(){
+  document.getElementById('cartCount').textContent = cart.length;
+  const body = document.getElementById('drawerBody');
+  if(cart.length===0){
+    body.innerHTML = '<div class="empty-cart">Votre panier est vide.<br>Ajoutez une formation pour commencer 🎓</div>';
+  } else {
+    body.innerHTML = cart.map((c,i)=>`
+      <div class="cart-item">
+        <div class="mini-thumb" style="background:${c.color}">${c.emoji}</div>
+        <div class="cart-item-info">
+          <div class="t">${c.title}</div>
+          <div class="p">${c.price.toLocaleString('fr-FR')} FCFA</div>
+        </div>
+        <button class="remove-x" onclick="removeFromCart(${i})">✕</button>
+      </div>
+    `).join('');
+  }
+  document.getElementById('totalPrice').textContent = cartTotal().toLocaleString('fr-FR') + ' FCFA';
+}
+function cartTotal(){ return cart.reduce((s,c)=>s+c.price,0); }
+
+function openCart(){ document.getElementById('drawer').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
+function closeCart(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function openSettings(){
+  document.getElementById('s_wave').value = settings.wave || "";
+  document.getElementById('s_om').value = settings.om || "";
+  document.getElementById('s_wa').value = settings.wa || "";
+  document.getElementById('s_name').value = settings.name || "";
+  openModal('settingsModal');
+}
+function saveSettings(){
+  settings = {
+    wave: document.getElementById('s_wave').value.trim(),
+    om: document.getElementById('s_om').value.trim(),
+    wa: document.getElementById('s_wa').value.trim().replace(/[^0-9]/g,''),
+    name: document.getElementById('s_name').value.trim()
+  };
+  persistSettings();
+  closeModal('settingsModal');
+  showToast('Coordonnées enregistrées sur cet appareil ✅');
+}
+
+function openCheckout(){
+  if(cart.length===0){ showToast('Votre panier est vide'); return; }
+  const total = cartTotal();
+  const hasPay = settings.wave || settings.om;
+  const hasWa = settings.wa;
+  let html = `<div class="checkout-total">Total à payer : ${total.toLocaleString('fr-FR')} FCFA</div>`;
+
+  if(!hasPay || !hasWa){
+    html += `<div class="config-warning">⚠️ Le vendeur n'a pas encore configuré ses numéros de réception (Wave / Orange Money / WhatsApp). Cliquez sur ⚙️ Réglages pour les ajouter.</div>`;
+  }
+  if(settings.wave){
+    html += `<div class="pay-option"><div class="pay-icon wave">🌊</div><div class="pay-details"><div class="name">Wave${settings.name?' — '+settings.name:''}</div><div class="num">${settings.wave}</div><div class="hint">Envoyer exactement ${total.toLocaleString('fr-FR')} FCFA</div></div></div>`;
+  }
+  if(settings.om){
+    html += `<div class="pay-option"><div class="pay-icon om">🍊</div><div class="pay-details"><div class="name">Orange Money${settings.name?' — '+settings.name:''}</div><div class="num">${settings.om}</div><div class="hint">Envoyer exactement ${total.toLocaleString('fr-FR')} FCFA</div></div></div>`;
+  }
+
+  html += `
+    <div class="field">
+      <label>Votre nom</label>
+      <input id="co_name" placeholder="Votre nom et prénom">
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin:10px 0 12px;">
+      Une fois le paiement effectué, cliquez ci-dessous : un message WhatsApp pré-rempli avec le récapitulatif de votre commande s'ouvrira, à envoyer pour recevoir l'accès à vos formations.
+    </p>
+    <button class="whatsapp-btn" onclick="sendToWhatsapp()">💬 J'ai payé — Envoyer la preuve sur WhatsApp</button>
+  `;
+  document.getElementById('checkoutBody').innerHTML = html;
+  openModal('checkoutModal');
+}
+
+function sendToWhatsapp(){
+  const buyerName = (document.getElementById('co_name')?.value || '').trim() || 'Client(e)';
+  const total = cartTotal();
+  const list = cart.map(c => `- ${c.title} (${c.price.toLocaleString('fr-FR')} FCFA)`).join('\\n');
+  const message = `Bonjour, je viens de payer ma commande sur FormaCI.\\n\\nNom : ${buyerName}\\nFormations commandées :\\n${list}\\n\\nTotal : ${total.toLocaleString('fr-FR')} FCFA\\nJe vous envoie la capture du paiement en pièce jointe.`;
+  const waNumber = settings.wa || '';
+  if(!waNumber){
+    showToast('Numéro WhatsApp non configuré — ouvrez ⚙️ Réglages');
+    return;
+  }
+  const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+  closeModal('checkoutModal');
+  closeCart();
+  showToast('Ouverture de WhatsApp pour finaliser votre commande...');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+function toggleSellerPanel(){
+  const p = document.getElementById('sellerPanel');
+  p.style.display = p.style.display==='none' ? 'block' : 'none';
+  if(p.style.display==='block') p.scrollIntoView({behavior:'smooth'});
+}
+
+function addCourse(){
+  const titre = document.getElementById('f_titre').value.trim();
+  const desc = document.getElementById('f_desc').value.trim() || "Description à venir.";
+  const cat = document.getElementById('f_cat').value;
+  const prix = parseInt(document.getElementById('f_prix').value);
+  const emoji = document.getElementById('f_emoji').value.trim() || '📚';
+  const niveau = document.getElementById('f_niveau').value.trim() || 'Tous niveaux';
+  if(!titre || !prix){ showToast('Merci de remplir au moins le titre et le prix'); return; }
+  const colors = ['#128a3e','#2563eb','#ff6600','#7c3aed','#dc2626','#0f766e'];
+  courses.unshift({
+    id:nextId++, title:titre, cat:cat, price:prix, instructor: settings.name || "Vous",
+    rating:5.0, emoji:emoji, color: colors[Math.floor(Math.random()*colors.length)],
+    level:niveau, duration:"À définir", desc:desc, modules:["Programme à compléter"]
+  });
+  document.getElementById('f_titre').value='';
+  document.getElementById('f_desc').value='';
+  document.getElementById('f_prix').value='';
+  document.getElementById('f_emoji').value='';
+  document.getElementById('f_niveau').value='';
+  toggleSellerPanel();
+  activeCat = 'Tous';
+  renderCatBar();
+  applyFilters();
+  showToast('Formation publiée avec succès 🎉');
+}
+
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('settingsModal').addEventListener('click', e=>{ if(e.target.id==='settingsModal') closeModal('settingsModal'); });
+document.getElementById('detailModal').addEventListener('click', e=>{ if(e.target.id==='detailModal') closeModal('detailModal'); });
+document.getElementById('checkoutModal').addEventListener('click', e=>{ if(e.target.id==='checkoutModal') closeModal('checkoutModal'); });
+
+loadSettings();
+renderCatBar();
+applyFilters();
+updateCartUI();
+</script>
+</body>
+</html>
